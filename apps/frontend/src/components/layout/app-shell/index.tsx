@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import { usePathname } from "next/navigation";
 import { TopHeader } from "@/components/layout/top-header";
 import { IconSidebar } from "@/components/layout/icon-sidebar";
@@ -76,7 +76,9 @@ function AppShellInner({
         {/* Secondary Sidebar - hidden on mobile and tablet */}
         {showSecondarySidebar && (
           <div className="hidden lg:block">
-            <SecondarySidebar />
+            <Suspense fallback={<SecondarySidebarSkeleton />}>
+              <SecondarySidebar />
+            </Suspense>
           </div>
         )}
 
@@ -203,6 +205,33 @@ function MobileBottomNav() {
         <span>Kurser</span>
       </a>
     </nav>
+  );
+}
+
+// Skeleton for the secondary sidebar during Suspense
+function SecondarySidebarSkeleton() {
+  return (
+    <aside className="flex h-full w-64 flex-col border-r border-light-grey bg-white">
+      {/* Header skeleton */}
+      <div className="flex items-center justify-between border-b border-light-grey px-4 py-3">
+        <div className="h-5 w-28 animate-pulse rounded bg-ghost-white" />
+        <div className="h-8 w-8 animate-pulse rounded bg-ghost-white" />
+      </div>
+      {/* Agreement selector skeleton */}
+      <div className="border-b border-light-grey p-4">
+        <div className="h-16 w-full animate-pulse rounded-lg bg-ghost-white" />
+      </div>
+      {/* Search skeleton */}
+      <div className="border-b border-light-grey p-4">
+        <div className="h-9 w-full animate-pulse rounded-lg bg-ghost-white" />
+      </div>
+      {/* Navigation items skeleton */}
+      <div className="flex-1 px-2 py-4">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="mb-2 h-8 w-full animate-pulse rounded-md bg-ghost-white" />
+        ))}
+      </div>
+    </aside>
   );
 }
 

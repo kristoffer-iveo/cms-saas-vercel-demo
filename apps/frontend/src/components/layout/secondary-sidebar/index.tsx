@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ChevronRight, ChevronDown, Search, PanelLeftClose, PanelLeft, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { getSiblingPages } from "./actions/getSiblingPages";
+import { getContentUrl } from "./actions/getContentUrl";
 
 export interface NavItem {
   key: string;
@@ -26,22 +27,75 @@ export function SecondarySidebar({
   defaultCollapsed = false,
 }: SecondarySidebarProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
   const [searchQuery, setSearchQuery] = useState("");
   const [pages, setPages] = useState<NavItem[]>([]);
   const [title, setTitle] = useState("Innehåll");
   const [isLoading, setIsLoading] = useState(true);
+  const [contentPath, setContentPath] = useState<string | null>(null);
 
-  // Fetch sibling pages when pathname changes
+  // Check if we're in preview mode and get the content key
+  const isPreviewMode = pathname === "/preview";
+  const contentKey = searchParams.get("key");
+  const locale = searchParams.get("loc") || "en";
+
+  // In preview mode, fetch the actual content URL first
   useEffect(() => {
+    if (!isPreviewMode) {
+      setContentPath(pathname);
+      return;
+    }
+
+    if (!contentKey) {
+      setContentPath(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    const fetchContentPath = async () => {
+      try {
+        const result = await getContentUrl({
+          key: contentKey,
+          locale: locale,
+        });
+
+        if (cancelled) return;
+
+        // Use hierarchical path for finding siblings
+        setContentPath(result.hierarchicalPath || result.url);
+      } catch (error) {
+        console.error("Error fetching content URL:", error);
+        if (!cancelled) {
+          setContentPath(null);
+        }
+      }
+    };
+
+    fetchContentPath();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isPreviewMode, contentKey, locale, pathname]);
+
+  // Fetch sibling pages when contentPath changes
+  useEffect(() => {
+    if (!contentPath) {
+      setIsLoading(false);
+      setPages([]);
+      return;
+    }
+
     let cancelled = false;
 
     const fetchPages = async () => {
       setIsLoading(true);
       try {
         const result = await getSiblingPages({
-          currentPath: pathname,
-          locale: "en",
+          currentPath: contentPath,
+          locale: locale,
           depth: 1,
         });
 
@@ -90,7 +144,7 @@ export function SecondarySidebar({
     return () => {
       cancelled = true;
     };
-  }, [pathname]);
+  }, [contentPath, locale]);
 
   // Filter pages based on search query
   const filteredPages = useMemo(() => {
@@ -196,7 +250,9 @@ export function SecondarySidebar({
               )}
 
               {filteredPages.map((page) => {
-                const isActive = pathname === page.href;
+                // Check if this page is the current one (works in both normal and preview mode)
+                const isActive = contentPath === page.href ||
+                  (contentPath && page.href && contentPath.endsWith(page.href.replace(/^\//, '')));
 
                 return (
                   <Link

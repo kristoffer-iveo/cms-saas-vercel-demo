@@ -29,13 +29,13 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: base,
     title: {
-      default: `Mosey Bank - An Optimizely Demo Company`,
-      template: `%s | Mosey Bank - An Optimizely Demo Company`,
+      default: `Svensk Handel - Arbetsgivarguiden`,
+      template: `%s | Svensk Handel - Arbetsgivarguiden`,
     },
     openGraph: {
       title: {
-        default: `Mosey Bank - An Optimizely Demo Company`,
-        template: `%s | Mosey Bank - An Optimizely Demo Company`,
+        default: `Svensk Handel - Arbetsgivarguiden`,
+        template: `%s | Svensk Handel - Arbetsgivarguiden`,
       },
       siteName: "Mosey Bank",
       images: [

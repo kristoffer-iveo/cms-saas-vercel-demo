@@ -943,6 +943,25 @@ ${LinkItemDataFragmentDoc}
 ${BlogPostPageMenuBlockFragmentDoc}
 ${ReferenceDataFragmentDoc}
 ${ButtonBlockDataFragmentDoc}`;
+export const getContentUrlDocument = gql`
+    query getContentUrl($key: String!, $locale: [Locales!]) {
+  content: _Content(
+    where: {_metadata: {key: {eq: $key}}}
+    locale: $locale
+    limit: 1
+  ) {
+    items {
+      _metadata {
+        key
+        url {
+          default
+          hierarchical
+        }
+      }
+    }
+  }
+}
+    `;
 export const getSiblingPagesDocument = gql`
     query getSiblingPages($parentPath: String!, $locale: [Locales!], $limit: Int = 50) {
   pages: _Page(
@@ -1298,6 +1317,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getHeaderData(variables?: Schema.getHeaderDataQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<Schema.getHeaderDataQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<Schema.getHeaderDataQuery>({ document: getHeaderDataDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'getHeaderData', 'query', variables);
+    },
+    getContentUrl(variables: Schema.getContentUrlQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<Schema.getContentUrlQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<Schema.getContentUrlQuery>({ document: getContentUrlDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'getContentUrl', 'query', variables);
     },
     getSiblingPages(variables: Schema.getSiblingPagesQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<Schema.getSiblingPagesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<Schema.getSiblingPagesQuery>({ document: getSiblingPagesDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'getSiblingPages', 'query', variables);

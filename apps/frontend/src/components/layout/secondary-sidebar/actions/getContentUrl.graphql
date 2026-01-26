@@ -1,0 +1,17 @@
+query getContentUrl($key: String!, $locale: [Locales!]) {
+  content: _Content(
+    where: { _metadata: { key: { eq: $key } } }
+    locale: $locale
+    limit: 1
+  ) {
+    items {
+      _metadata {
+        key
+        url {
+          default
+          hierarchical
+        }
+      }
+    }
+  }
+}
