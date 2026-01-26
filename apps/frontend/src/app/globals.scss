@@ -2,16 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Ensure proper scrolling for CMS preview compatibility */
-html,
-body {
-  height: 100%;
-}
-
-#__next,
-[data-nextjs-scroll-focus-boundary] {
-  min-height: 100%;
-}
 
 @layer base {
   :root {

@@ -32,6 +32,23 @@ export function AppShell({
   showSecondarySidebar = true,
   showChecklist = true,
 }: AppShellProps) {
+  const pathname = usePathname();
+  const isPreviewMode = pathname === "/preview";
+
+  // In preview mode, use a simple layout without fixed sidebars
+  // This ensures CMS overlay positioning works correctly when scrolling
+  if (isPreviewMode) {
+    return (
+      <CommentProvider>
+        <div className="min-h-screen bg-white">
+          <div className="mx-auto max-w-4xl p-6">
+            {children}
+          </div>
+        </div>
+      </CommentProvider>
+    );
+  }
+
   return (
     <CommentProvider>
       <AppShellInner
