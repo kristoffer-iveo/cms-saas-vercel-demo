@@ -71,13 +71,24 @@ function AppShellInner({
     href: "/" + pathParts.slice(0, index + 1).join("/"),
   }));
 
-  // Trigger a scroll event on mount in preview mode to initialize CMS overlay positions
+  // Initialize preview mode: focus the iframe and trigger events
+  // This ensures CMS overlay positions are calculated and interactive
   useEffect(() => {
     if (isPreviewMode && typeof window !== "undefined") {
       // Small delay to ensure DOM is ready
       const timer = setTimeout(() => {
+        // Focus the window so the iframe receives input
+        window.focus();
+
+        // Dispatch focus event
+        window.dispatchEvent(new FocusEvent("focus"));
+
+        // Trigger scroll event to initialize overlay positions
         window.dispatchEvent(new Event("scroll"));
-      }, 100);
+
+        // Dispatch a mouseenter on the document to activate hover tracking
+        document.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+      }, 50);
       return () => clearTimeout(timer);
     }
   }, [isPreviewMode]);
