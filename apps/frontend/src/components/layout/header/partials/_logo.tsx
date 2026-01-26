@@ -9,6 +9,7 @@ type LogoProps = JSX.IntrinsicElements["a"] & {
   logo?: string;
 };
 
+
 export const Logo: FunctionComponent<LogoProps> = ({
   logo = "/assets/sh-logotype-thumb.svg",
   ...divProps
