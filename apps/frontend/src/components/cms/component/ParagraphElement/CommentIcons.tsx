@@ -12,8 +12,8 @@ interface CommentIconsProps {
 export function CommentIcons({ internalComment, externalComment }: CommentIconsProps) {
   const commentContext = useCommentSafe();
 
-  const hasInternal = internalComment?.html || internalComment?.json;
-  const hasExternal = externalComment?.html || externalComment?.json;
+  const hasInternal = !!(internalComment?.html || internalComment?.json);
+  const hasExternal = !!(externalComment?.html || externalComment?.json);
 
   if (!hasInternal && !hasExternal) {
     return null;
