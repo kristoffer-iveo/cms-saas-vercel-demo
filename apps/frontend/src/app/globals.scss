@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ensure full height for iframe/CMS preview compatibility */
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+#__next,
+[data-nextjs-scroll-focus-boundary] {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

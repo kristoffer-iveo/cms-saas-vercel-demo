@@ -62,7 +62,7 @@ function AppShellInner({
     href: "/" + pathParts.slice(0, index + 1).join("/"),
   }));
   return (
-    <div className="flex h-dvh min-h-0 flex-col bg-ghost-white">
+    <div className="flex h-full min-h-0 flex-col bg-ghost-white">
       {/* Top Header */}
       <TopHeader />
 
