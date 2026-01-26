@@ -35,26 +35,13 @@ export function AppShell({
   const pathname = usePathname();
   const isPreviewMode = pathname === "/preview";
 
-  // In preview mode, use a simple layout without fixed sidebars
-  // This ensures CMS overlay positioning works correctly when scrolling
-  if (isPreviewMode) {
-    return (
-      <CommentProvider>
-        <div className="min-h-screen bg-white">
-          <div className="mx-auto max-w-4xl p-6">
-            {children}
-          </div>
-        </div>
-      </CommentProvider>
-    );
-  }
-
   return (
     <CommentProvider>
       <AppShellInner
         className={className}
         showSecondarySidebar={showSecondarySidebar}
         showChecklist={showChecklist}
+        isPreviewMode={isPreviewMode}
       >
         {children}
       </AppShellInner>
@@ -62,12 +49,17 @@ export function AppShell({
   );
 }
 
+interface AppShellInnerProps extends AppShellProps {
+  isPreviewMode?: boolean;
+}
+
 function AppShellInner({
   children,
   className,
   showSecondarySidebar = true,
   showChecklist = true,
-}: AppShellProps) {
+  isPreviewMode = false,
+}: AppShellInnerProps) {
   const pathname = usePathname();
   const commentContext = useCommentSafe();
   const hasSelectedComment = !!commentContext?.selectedComment;
@@ -79,6 +71,99 @@ function AppShellInner({
     href: "/" + pathParts.slice(0, index + 1).join("/"),
   }));
 
+  // In preview mode, use a flexbox layout where everything scrolls together
+  // This ensures CMS overlay positioning works correctly
+  if (isPreviewMode) {
+    return (
+      <div className="min-h-screen bg-ghost-white">
+        {/* Top Header - scrolls with content in preview */}
+        <TopHeader />
+
+        {/* Main layout row */}
+        <div className="flex">
+          {/* Left Icon Sidebar */}
+          <div className="hidden flex-shrink-0 md:block">
+            <IconSidebar />
+          </div>
+
+          {/* Secondary Sidebar */}
+          {showSecondarySidebar && (
+            <div className="hidden flex-shrink-0 lg:block">
+              <Suspense fallback={<SecondarySidebarSkeleton />}>
+                <SecondarySidebar />
+              </Suspense>
+            </div>
+          )}
+
+          {/* Main Content */}
+          <main className={cn("min-w-0 flex-1 bg-ghost-white", className)}>
+            {/* Content Header with Breadcrumbs */}
+            <div className="flex items-center justify-between border-b border-light-grey bg-white px-6 py-3">
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/" className="text-pale-sky hover:text-vulcan">
+                      Hem
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  {breadcrumbs.map((crumb, index) => (
+                    <span key={crumb.label} className="contents">
+                      <BreadcrumbSeparator className="text-mischka" />
+                      <BreadcrumbItem>
+                        {index === breadcrumbs.length - 1 ? (
+                          <BreadcrumbPage className="text-vulcan">
+                            {crumb.label}
+                          </BreadcrumbPage>
+                        ) : (
+                          <BreadcrumbLink
+                            href={crumb.href}
+                            className="text-pale-sky hover:text-vulcan"
+                          >
+                            {crumb.label}
+                          </BreadcrumbLink>
+                        )}
+                      </BreadcrumbItem>
+                    </span>
+                  ))}
+                </BreadcrumbList>
+              </Breadcrumb>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center gap-2 text-sm text-pale-sky hover:text-vulcan"
+                >
+                  <Volume2 className="h-4 w-4" />
+                  <span className="hidden sm:inline">Lyssna</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center gap-2 text-sm text-pale-sky hover:text-vulcan"
+                >
+                  <Printer className="h-4 w-4" />
+                  <span className="hidden sm:inline">Skriv ut</span>
+                </Button>
+              </div>
+            </div>
+
+            {/* Page Content */}
+            <div className="p-6">{children}</div>
+          </main>
+
+          {/* Comment Sidebar */}
+          {showChecklist && hasSelectedComment && (
+            <div className="hidden w-80 flex-shrink-0 lg:block">
+              <CommentSidebar />
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Normal mode with fixed sidebars
   // Calculate left margin based on visible sidebars
   // IconSidebar: 64px (w-16), SecondarySidebar: 256px (w-64)
   const iconSidebarWidth = "md:ml-16";
