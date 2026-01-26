@@ -287,6 +287,14 @@ export const ParagraphElementDataFragmentDoc = gql`
   text {
     json
   }
+  internal_comment {
+    json
+    html
+  }
+  external_comment {
+    json
+    html
+  }
 }
     `;
 export const QuoteBlockDataFragmentDoc = gql`
@@ -935,6 +943,27 @@ ${LinkItemDataFragmentDoc}
 ${BlogPostPageMenuBlockFragmentDoc}
 ${ReferenceDataFragmentDoc}
 ${ButtonBlockDataFragmentDoc}`;
+export const getSiblingPagesDocument = gql`
+    query getSiblingPages($parentPath: String!, $locale: [Locales!], $limit: Int = 50) {
+  pages: _Page(
+    where: {_metadata: {url: {hierarchical: {startsWith: $parentPath}}}}
+    locale: $locale
+    limit: $limit
+    orderBy: {_metadata: {url: {hierarchical: ASC}}}
+  ) {
+    items {
+      _metadata {
+        key
+        displayName
+        url {
+          default
+          hierarchical
+        }
+      }
+    }
+  }
+}
+    `;
 export const getLocalesDocument = gql`
     query getLocales {
   schema: __schema {
@@ -1269,6 +1298,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getHeaderData(variables?: Schema.getHeaderDataQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<Schema.getHeaderDataQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<Schema.getHeaderDataQuery>({ document: getHeaderDataDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'getHeaderData', 'query', variables);
+    },
+    getSiblingPages(variables: Schema.getSiblingPagesQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<Schema.getSiblingPagesQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<Schema.getSiblingPagesQuery>({ document: getSiblingPagesDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'getSiblingPages', 'query', variables);
     },
     getLocales(variables?: Schema.getLocalesQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<Schema.getLocalesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<Schema.getLocalesQuery>({ document: getLocalesDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'getLocales', 'query', variables);

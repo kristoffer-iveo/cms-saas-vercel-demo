@@ -26,6 +26,9 @@ export const middleware = (request: NextRequest) =>
     // Expose the search params
     requestHeaders.set('x-search', request.nextUrl.search)
 
+    // Expose the pathname for layout navigation
+    requestHeaders.set('x-pathname', request.nextUrl.pathname)
+
     const response = NextResponse.next({
         request: {
             headers: requestHeaders

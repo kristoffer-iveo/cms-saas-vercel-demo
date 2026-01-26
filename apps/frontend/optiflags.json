@@ -30,7 +30,7 @@
       "logo": {
         "description": "The URL/Path to the logo file to use",
         "type": "string",
-        "default": "/assets/moseybank-logo.svg"
+        "default": "/assets/sh-logotype-thumb.svg"
       },
       "theme_switcher": {
         "description": "Enable/disable the theme switcher, when disabled it forces the site to follow system settings.",

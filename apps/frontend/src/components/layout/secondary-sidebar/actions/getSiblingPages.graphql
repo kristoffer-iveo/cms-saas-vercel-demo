@@ -1,0 +1,25 @@
+query getSiblingPages($parentPath: String!, $locale: [Locales!], $limit: Int = 50) {
+  pages: _Page(
+    where: {
+      _metadata: {
+        url: {
+          hierarchical: { startsWith: $parentPath }
+        }
+      }
+    }
+    locale: $locale
+    limit: $limit
+    orderBy: { _metadata: { url: { hierarchical: ASC } } }
+  ) {
+    items {
+      _metadata {
+        key
+        displayName
+        url {
+          default
+          hierarchical
+        }
+      }
+    }
+  }
+}

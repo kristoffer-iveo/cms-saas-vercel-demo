@@ -3,8 +3,6 @@ import type { Metadata } from "next";
 import { Figtree } from "next/font/google";
 import "./globals.scss";
 import { Body, ThemeProvider } from "@/components/theme"
-import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
 import { factory } from '@/components/factory';
 import { createClient } from '@remkoj/optimizely-graph-client';
 
@@ -16,6 +14,9 @@ import { ServerContext } from "@remkoj/optimizely-cms-react/rsc";
 import { OptimizelyOneProvider, PageActivator } from "@remkoj/optimizely-one-nextjs/client";
 import GoogleAnalytics from '@/components/integrations/google-analytics'
 import { SpeedInsights } from "@vercel/speed-insights/next"
+
+// New layout components
+import { AppShell } from "@/components/layout/app-shell";
 
 /* eslint-disable @next/next/no-css-tags */
 
@@ -71,7 +72,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
 
   // Allow environment control over whether the WX snippet can be changed by the client
   const forceDisableOverride = EnvTools.readValueAsBoolean("DISABLE_WX_SWITCHER", false);
-  
+
   // Check if services are enabled
   const ga_id = EnvTools.readValue("GA_TRACKING_ID");
   const enableGoogleAnalytics = ga_id && ga_id.trim() != "";
@@ -87,11 +88,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <Body className={`${figtree.className} on-ghost-white overflow-x-hidden`}>
           <OptimizelyOneProvider value={{ debug: false }} >
             <PageActivator />
-            <div className="flex min-h-screen flex-col justify-between">
-              <Header locale={ locale } ctx={ ctx } />
-              <main className="grow">{ children }</main>
-              <Footer ctx={ ctx } />
-            </div>
+            <AppShell>
+              { children }
+            </AppShell>
             <OptimizelyOneGadget />
           </OptimizelyOneProvider>
           <Scripts.Footer />

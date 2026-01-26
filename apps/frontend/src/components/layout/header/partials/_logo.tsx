@@ -10,7 +10,7 @@ type LogoProps = JSX.IntrinsicElements["a"] & {
 };
 
 export const Logo: FunctionComponent<LogoProps> = ({
-  logo = "/assets/moseybank-logo.svg",
+  logo = "/assets/sh-logotype-thumb.svg",
   ...divProps
 }) => {
   // Create a stable default value that doesn't change every render

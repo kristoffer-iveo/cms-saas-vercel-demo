@@ -1,3 +1,5 @@
 fragment ParagraphElementData on ParagraphElement {
   text { json }
+  internal_comment { json html }
+  external_comment { json html }
 }
