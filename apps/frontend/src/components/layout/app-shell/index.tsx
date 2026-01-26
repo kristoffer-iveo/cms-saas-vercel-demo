@@ -62,12 +62,12 @@ function AppShellInner({
     href: "/" + pathParts.slice(0, index + 1).join("/"),
   }));
   return (
-    <div className="flex h-screen flex-col bg-ghost-white">
+    <div className="flex h-dvh min-h-0 flex-col bg-ghost-white">
       {/* Top Header */}
       <TopHeader />
 
       {/* Main Content Area */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex min-h-0 flex-1 overflow-hidden">
         {/* Left Icon Sidebar - hidden on mobile */}
         <div className="hidden md:block">
           <IconSidebar />
@@ -83,7 +83,7 @@ function AppShellInner({
         )}
 
         {/* Main Content */}
-        <main className={cn("flex flex-1 flex-col overflow-hidden", className)}>
+        <main className={cn("flex min-h-0 flex-1 flex-col overflow-hidden", className)}>
           {/* Content Header with Breadcrumbs and Actions */}
           <div className="flex items-center justify-between border-b border-light-grey bg-white px-6 py-3">
             {/* Breadcrumbs */}
@@ -138,7 +138,7 @@ function AppShellInner({
           </div>
 
           {/* Scrollable Content Area - using native scroll for SSR compatibility */}
-          <div className="flex-1 overflow-auto">
+          <div className="min-h-0 flex-1 overflow-auto">
             <div className="p-6">{children}</div>
           </div>
         </main>
