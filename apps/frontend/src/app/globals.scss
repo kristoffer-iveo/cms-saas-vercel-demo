@@ -2,18 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Ensure full height for iframe/CMS preview compatibility */
+/* Ensure proper scrolling for CMS preview compatibility */
 html,
 body {
   height: 100%;
-  overflow: hidden;
 }
 
 #__next,
 [data-nextjs-scroll-focus-boundary] {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+  min-height: 100%;
 }
 
 @layer base {

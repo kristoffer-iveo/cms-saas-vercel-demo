@@ -61,100 +61,113 @@ function AppShellInner({
     label: part.charAt(0).toUpperCase() + part.slice(1).replace(/-/g, " "),
     href: "/" + pathParts.slice(0, index + 1).join("/"),
   }));
+
+  // Calculate left margin based on visible sidebars
+  // IconSidebar: 64px (w-16), SecondarySidebar: 256px (w-64)
+  const iconSidebarWidth = "md:ml-16";
+  const secondarySidebarWidth = showSecondarySidebar ? "lg:ml-80" : "lg:ml-16";
+
   return (
-    <div className="flex h-full min-h-0 flex-col bg-ghost-white">
-      {/* Top Header */}
-      <TopHeader />
+    <div className="min-h-screen bg-ghost-white">
+      {/* Top Header - Sticky */}
+      <div className="sticky top-0 z-40">
+        <TopHeader />
+      </div>
 
-      {/* Main Content Area */}
-      <div className="flex min-h-0 flex-1 overflow-hidden">
-        {/* Left Icon Sidebar - hidden on mobile */}
-        <div className="hidden md:block">
-          <IconSidebar />
+      {/* Left Icon Sidebar - Fixed */}
+      <div className="fixed left-0 top-16 z-30 hidden h-[calc(100vh-4rem)] md:block">
+        <IconSidebar />
+      </div>
+
+      {/* Secondary Sidebar - Fixed */}
+      {showSecondarySidebar && (
+        <div className="fixed left-16 top-16 z-20 hidden h-[calc(100vh-4rem)] lg:block">
+          <Suspense fallback={<SecondarySidebarSkeleton />}>
+            <SecondarySidebar />
+          </Suspense>
         </div>
+      )}
 
-        {/* Secondary Sidebar - hidden on mobile and tablet */}
-        {showSecondarySidebar && (
-          <div className="hidden lg:block">
-            <Suspense fallback={<SecondarySidebarSkeleton />}>
-              <SecondarySidebar />
-            </Suspense>
-          </div>
-        )}
-
-        {/* Main Content */}
-        <main className={cn("flex min-h-0 flex-1 flex-col overflow-hidden", className)}>
-          {/* Content Header with Breadcrumbs and Actions */}
-          <div className="flex items-center justify-between border-b border-light-grey bg-white px-6 py-3">
-            {/* Breadcrumbs */}
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/" className="text-pale-sky hover:text-vulcan">
-                    Hem
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                {breadcrumbs.map((crumb, index) => (
-                  <span key={crumb.label} className="contents">
-                    <BreadcrumbSeparator className="text-mischka" />
-                    <BreadcrumbItem>
-                      {index === breadcrumbs.length - 1 ? (
-                        <BreadcrumbPage className="text-vulcan">
-                          {crumb.label}
-                        </BreadcrumbPage>
-                      ) : (
-                        <BreadcrumbLink
-                          href={crumb.href}
-                          className="text-pale-sky hover:text-vulcan"
-                        >
-                          {crumb.label}
-                        </BreadcrumbLink>
-                      )}
-                    </BreadcrumbItem>
-                  </span>
-                ))}
-              </BreadcrumbList>
-            </Breadcrumb>
-
-            {/* Action Buttons */}
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex items-center gap-2 text-sm text-pale-sky hover:text-vulcan"
-              >
-                <Volume2 className="h-4 w-4" />
-                <span className="hidden sm:inline">Lyssna</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex items-center gap-2 text-sm text-pale-sky hover:text-vulcan"
-              >
-                <Printer className="h-4 w-4" />
-                <span className="hidden sm:inline">Skriv ut</span>
-              </Button>
-            </div>
-          </div>
-
-          {/* Scrollable Content Area - using native scroll for SSR compatibility */}
-          <div className="min-h-0 flex-1 overflow-auto">
-            <div className="p-6">{children}</div>
-          </div>
-        </main>
-
-        {/* Comment Sidebar - slides out when a comment is selected */}
-        {showChecklist && (
-          <div
-            className={cn(
-              "hidden lg:flex h-full transition-all duration-300 ease-in-out overflow-hidden",
-              hasSelectedComment ? "w-80" : "w-0"
-            )}
-          >
+      {/* Comment Sidebar - Fixed, slides out when comment selected */}
+      {showChecklist && (
+        <div
+          className={cn(
+            "fixed right-0 top-16 z-20 hidden h-[calc(100vh-4rem)] transition-all duration-300 ease-in-out lg:block",
+            hasSelectedComment ? "w-80" : "w-0"
+          )}
+        >
+          <div className="h-full w-80">
             <CommentSidebar />
           </div>
+        </div>
+      )}
+
+      {/* Main Content - Scrolls with document */}
+      <main
+        className={cn(
+          "min-h-[calc(100vh-4rem)] bg-ghost-white transition-all duration-300",
+          iconSidebarWidth,
+          secondarySidebarWidth,
+          hasSelectedComment && showChecklist ? "lg:mr-80" : "",
+          className
         )}
-      </div>
+      >
+        {/* Content Header with Breadcrumbs and Actions - Sticky */}
+        <div className="sticky top-16 z-10 flex items-center justify-between border-b border-light-grey bg-white px-6 py-3">
+          {/* Breadcrumbs */}
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/" className="text-pale-sky hover:text-vulcan">
+                  Hem
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              {breadcrumbs.map((crumb, index) => (
+                <span key={crumb.label} className="contents">
+                  <BreadcrumbSeparator className="text-mischka" />
+                  <BreadcrumbItem>
+                    {index === breadcrumbs.length - 1 ? (
+                      <BreadcrumbPage className="text-vulcan">
+                        {crumb.label}
+                      </BreadcrumbPage>
+                    ) : (
+                      <BreadcrumbLink
+                        href={crumb.href}
+                        className="text-pale-sky hover:text-vulcan"
+                      >
+                        {crumb.label}
+                      </BreadcrumbLink>
+                    )}
+                  </BreadcrumbItem>
+                </span>
+              ))}
+            </BreadcrumbList>
+          </Breadcrumb>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex items-center gap-2 text-sm text-pale-sky hover:text-vulcan"
+            >
+              <Volume2 className="h-4 w-4" />
+              <span className="hidden sm:inline">Lyssna</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex items-center gap-2 text-sm text-pale-sky hover:text-vulcan"
+            >
+              <Printer className="h-4 w-4" />
+              <span className="hidden sm:inline">Skriv ut</span>
+            </Button>
+          </div>
+        </div>
+
+        {/* Page Content - Flows naturally */}
+        <div className="p-6">{children}</div>
+      </main>
 
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav />
@@ -165,7 +178,7 @@ function AppShellInner({
 // Mobile bottom navigation bar
 function MobileBottomNav() {
   return (
-    <nav className="flex h-16 items-center justify-around border-t border-light-grey bg-white md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 flex h-16 items-center justify-around border-t border-light-grey bg-white md:hidden">
       <a
         href="/"
         className="flex flex-col items-center gap-1 text-xs text-pale-sky"
