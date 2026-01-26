@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, Suspense } from "react";
+import { ReactNode, Suspense, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { TopHeader } from "@/components/layout/top-header";
 import { IconSidebar } from "@/components/layout/icon-sidebar";
@@ -70,6 +70,17 @@ function AppShellInner({
     label: part.charAt(0).toUpperCase() + part.slice(1).replace(/-/g, " "),
     href: "/" + pathParts.slice(0, index + 1).join("/"),
   }));
+
+  // Trigger a scroll event on mount in preview mode to initialize CMS overlay positions
+  useEffect(() => {
+    if (isPreviewMode && typeof window !== "undefined") {
+      // Small delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        window.dispatchEvent(new Event("scroll"));
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isPreviewMode]);
 
   // In preview mode, use a flexbox layout where everything scrolls together
   // This ensures CMS overlay positioning works correctly
