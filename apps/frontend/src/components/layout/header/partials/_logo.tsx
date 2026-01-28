@@ -17,7 +17,7 @@ export const Logo: FunctionComponent<LogoProps> = ({
   // Create a stable default value that doesn't change every render
   const defaultValue = useMemo(() => { return { logo, theme_switcher: false } }, [ logo ])
 
-  
+
   // Get the logo configuration
   const { logo: logoUrl } = useFlag("layout_configuration", defaultValue);
   return (
